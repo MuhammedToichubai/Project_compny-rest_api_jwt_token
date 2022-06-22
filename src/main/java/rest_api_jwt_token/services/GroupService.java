@@ -4,12 +4,16 @@ import rest_api_jwt_token.dto.request.GroupRequest;
 import rest_api_jwt_token.dto.response.GroupResponse;
 import rest_api_jwt_token.dto.response.ResponseDeleted;
 import rest_api_jwt_token.exceptions.ThisNotFoundException;
+import rest_api_jwt_token.models.Course;
 import rest_api_jwt_token.models.Group;
 import rest_api_jwt_token.mapper.editMapper.GroupEditMapper;
 import rest_api_jwt_token.mapper.viewMapper.GroupViewMapper;
+import rest_api_jwt_token.repositories.CourseRepository;
 import rest_api_jwt_token.repositories.GroupRepository;
 import org.springframework.stereotype.Service;
+import rest_api_jwt_token.repositories.StudentRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,24 +22,39 @@ import java.util.List;
 @Service
 public class GroupService {
 
-    private final GroupRepository repository;
+    private final GroupRepository groupRepository;
     private final GroupEditMapper editMapper;
     private final GroupViewMapper viewMapper;
+    private final CourseRepository courseRepository;
 
-    public GroupService(GroupRepository repository, GroupEditMapper editMapper, GroupViewMapper viewMapper) {
-        this.repository = repository;
+    public GroupService(GroupRepository repository, GroupEditMapper editMapper, GroupViewMapper viewMapper, CourseRepository courseRepository, StudentRepository studentRepository) {
+        this.groupRepository = repository;
         this.editMapper = editMapper;
         this.viewMapper = viewMapper;
+        this.courseRepository = courseRepository;
     }
 
-    public GroupResponse creat(GroupRequest request) {
+    public GroupResponse save(GroupRequest request) {
         Group group = editMapper.save(request);
-        repository.save(group);
+        group.setCourses(getCoursesToGroup(request.getCourse()));
+        groupRepository.save(group);
         return viewMapper.viewGroup(group);
     }
 
+    private List<Course> getCoursesToGroup(List<Long> courseId ){
+        List<Course> courses = new ArrayList<>();
+        for (Long course : courseId) {
+            courses.add( courseRepository.findById(course)
+                    .orElseThrow(() -> new ThisNotFoundException(
+                            "Course whit id = " + courseId + " not found!"
+                    ))
+            );
+        }
+        return courses;
+    }
+
     private Group getGroupThroughId(Long id){
-        return repository.findById(id)
+        return groupRepository.findById(id)
                 .orElseThrow( () -> new ThisNotFoundException(
                         "Group whit id = " +id +" not found!"
                 ));
@@ -54,13 +73,13 @@ public class GroupService {
 
     public ResponseDeleted delete(Long groupId) {
 
-        boolean exists = repository.existsById(groupId);
+        boolean exists = groupRepository.existsById(groupId);
         if (!exists) {
             throw new ThisNotFoundException(
                     "Group whit id = " + groupId + " not found!"
             );
         }
-        repository.deleteById(groupId);
+        groupRepository.deleteById(groupId);
 
         return new ResponseDeleted(
                 "DELETED",
@@ -70,6 +89,6 @@ public class GroupService {
     }
 
     public List<GroupResponse> findAll() {
-        return viewMapper.view(repository.findAll());
+        return viewMapper.view(groupRepository.findAll());
     }
 }

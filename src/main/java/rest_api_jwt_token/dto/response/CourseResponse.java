@@ -16,7 +16,6 @@ public class CourseResponse {
     private Long id;
     private String courseName;
     private String duration;
-    private Company company;
     private LocalDateTime localDateTime;
     private boolean isActive;
 }

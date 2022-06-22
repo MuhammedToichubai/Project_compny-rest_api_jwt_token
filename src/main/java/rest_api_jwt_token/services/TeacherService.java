@@ -4,9 +4,11 @@ import rest_api_jwt_token.dto.request.TeacherRequest;
 import rest_api_jwt_token.dto.response.ResponseDeleted;
 import rest_api_jwt_token.dto.response.TeacherResponse;
 import rest_api_jwt_token.exceptions.ThisNotFoundException;
+import rest_api_jwt_token.models.Course;
 import rest_api_jwt_token.models.Teacher;
 import rest_api_jwt_token.mapper.editMapper.TeacherEditMapper;
 import rest_api_jwt_token.mapper.viewMapper.TeacherViewMapper;
+import rest_api_jwt_token.repositories.CourseRepository;
 import rest_api_jwt_token.repositories.TeacherRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,24 +21,34 @@ import java.util.List;
 
 public class TeacherService {
 
-    private final TeacherRepository repository;
+    private final TeacherRepository teacherRepository;
     private final TeacherEditMapper editMapper;
     private final TeacherViewMapper viewMapper;
+    private final CourseRepository courseRepository;
 
-    public TeacherService(TeacherRepository repository, TeacherEditMapper editMapper, TeacherViewMapper viewMapper) {
-        this.repository = repository;
+    public TeacherService(TeacherRepository repository, TeacherEditMapper editMapper, TeacherViewMapper viewMapper, CourseRepository courseRepository) {
+        this.teacherRepository = repository;
         this.editMapper = editMapper;
         this.viewMapper = viewMapper;
+        this.courseRepository = courseRepository;
     }
 
     public TeacherResponse save(TeacherRequest request) {
         Teacher teacher = editMapper.save(request);
-        repository.save(teacher);
+        teacher.setCourse(getCourseToTeacher(request.getCourseId()));
+        teacherRepository.save(teacher);
         return viewMapper.viewTeacher(teacher);
     }
 
+    private Course getCourseToTeacher(Long id){
+        return courseRepository.findById(id)
+                .orElseThrow( () -> new ThisNotFoundException(
+                        "Course whit id = " +id +" not found!"
+                ));
+    }
+
     private Teacher getTeacherThroughId(Long id){
-        return repository.findById(id)
+        return teacherRepository.findById(id)
                 .orElseThrow( () -> new ThisNotFoundException(
                         "Teacher whit id = " +id +" not found!"
                 ));
@@ -44,7 +56,7 @@ public class TeacherService {
 
     public TeacherResponse update(Long id, TeacherRequest request) {
         Teacher teacher = getTeacherThroughId(id);
-        repository.save(teacher);
+        teacherRepository.save(teacher);
         return viewMapper.viewTeacher(teacher);
     }
 
@@ -55,13 +67,13 @@ public class TeacherService {
 
     public ResponseDeleted delete(Long teacherId) {
 
-        boolean exists = repository.existsById(teacherId);
+        boolean exists = teacherRepository.existsById(teacherId);
         if (!exists) {
             throw new ThisNotFoundException(
                     "Teacher whit id = " + teacherId + " not found!"
             );
         }
-        repository.deleteById(teacherId);
+        teacherRepository.deleteById(teacherId);
 
         return new ResponseDeleted(
                 "DELETED",
@@ -70,6 +82,6 @@ public class TeacherService {
     }
 
     public List<TeacherResponse> findAll() {
-        return viewMapper.view(repository.findAll());
+        return viewMapper.view(teacherRepository.findAll());
     }
 }

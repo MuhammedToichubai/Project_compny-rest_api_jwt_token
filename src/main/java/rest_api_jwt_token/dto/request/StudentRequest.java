@@ -14,5 +14,7 @@ public class StudentRequest {
     private String surname;
     private String email;
     private StudyFormat studyFormat;
+    private Long groupId;
+
 
 }

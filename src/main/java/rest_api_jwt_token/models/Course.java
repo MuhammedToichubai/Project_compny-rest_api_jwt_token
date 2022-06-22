@@ -1,17 +1,17 @@
 package rest_api_jwt_token.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static javax.persistence.CascadeType.*;
+import static javax.persistence.FetchType.EAGER;
 
 /**
  * @author Muhammed Toichubai
@@ -36,22 +36,19 @@ public class Course {
     private Long id;
 
     @Column(name = "course_Name")
-    @NotEmpty
     private String courseName;
 
-    @NotEmpty
     @Column(name = "course_duration")
     private String duration;
 
-    @ManyToMany(mappedBy = "courses", fetch = FetchType.EAGER)
-    @Fetch(value = FetchMode.SUBSELECT)
-    private List<Group> group;
+    @ManyToMany(fetch = EAGER, mappedBy = "courses", cascade = {MERGE, REFRESH,DETACH,REMOVE})
+    private List<Group> groups;
 
-    @OneToOne(mappedBy = "course", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+    @OneToOne(cascade = ALL, mappedBy = "course")
     private Teacher teacher;
 
-    @ManyToOne
-    @JsonIgnore
+    @ManyToOne(cascade = {MERGE, DETACH, REFRESH})
+    @JoinColumn(name = "company_id")
     private Company company;
 
     @Column(name = "local_date_time")

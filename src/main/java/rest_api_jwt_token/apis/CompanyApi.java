@@ -12,7 +12,7 @@ import java.util.List;
  * @author Muhammed Toichubai
  */
 @RestController
-@RequestMapping("/api/company")
+@RequestMapping("/api/companies")
 public class CompanyApi {
 
     private final CompanyService companyService;

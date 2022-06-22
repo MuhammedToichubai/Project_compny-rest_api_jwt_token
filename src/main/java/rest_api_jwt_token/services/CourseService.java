@@ -4,9 +4,11 @@ import rest_api_jwt_token.dto.request.CourseRequest;
 import rest_api_jwt_token.dto.response.CourseResponse;
 import rest_api_jwt_token.dto.response.ResponseDeleted;
 import rest_api_jwt_token.exceptions.ThisNotFoundException;
+import rest_api_jwt_token.models.Company;
 import rest_api_jwt_token.models.Course;
 import rest_api_jwt_token.mapper.editMapper.CourseEditMapper;
 import rest_api_jwt_token.mapper.viewMapper.CourseViewMapper;
+import rest_api_jwt_token.repositories.CompanyRepository;
 import rest_api_jwt_token.repositories.CourseRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,24 +20,34 @@ import java.util.List;
 @Service
 public class CourseService {
 
-    private final CourseRepository repository;
+    private final CourseRepository courseRepository;
     private final CourseEditMapper editMapper;
     private final CourseViewMapper viewMapper;
+    private final CompanyRepository companyRepository;
 
-    public CourseService(CourseRepository repository, CourseEditMapper editMapper, CourseViewMapper viewMapper) {
-        this.repository = repository;
+    public CourseService(CourseRepository repository, CourseEditMapper editMapper, CourseViewMapper viewMapper, CompanyRepository companyRepository) {
+        this.courseRepository = repository;
         this.editMapper = editMapper;
         this.viewMapper = viewMapper;
+        this.companyRepository = companyRepository;
     }
 
     public CourseResponse save(CourseRequest request) {
         Course course = editMapper.creat(request);
-        repository.save(course);
+        course.setCompany(getCompanyToCourse(request.getCompanyId()));
+        courseRepository.save(course);
         return viewMapper.viewCourse(course);
     }
 
+    private Company getCompanyToCourse(Long id){
+        return companyRepository.findById(id)
+                .orElseThrow( () -> new ThisNotFoundException(
+                        "Company whit id = " +id +" not found!"
+                ));
+    }
+
     private Course getCourseThroughId(Long courseId){
-        return repository.findById(courseId)
+        return courseRepository.findById(courseId)
                 .orElseThrow( () -> new ThisNotFoundException(
                         "Course whit id = " +courseId +" not found!"
                 ));
@@ -44,7 +56,7 @@ public class CourseService {
     public CourseResponse update(Long id, CourseRequest request) {
         Course course = getCourseThroughId(id);
         editMapper.update(course, request);
-        return viewMapper.viewCourse(repository.save(course));
+        return viewMapper.viewCourse(courseRepository.save(course));
     }
 
     public CourseResponse findById(Long id) {
@@ -54,13 +66,13 @@ public class CourseService {
 
     public ResponseDeleted delete(Long courseId) {
 
-        boolean exists = repository.existsById(courseId);
+        boolean exists = courseRepository.existsById(courseId);
         if (!exists) {
             throw new ThisNotFoundException(
                     "Course whit id = " + courseId + " not found!"
             );
         }
-        repository.deleteById(courseId);
+        courseRepository.deleteById(courseId);
 
         return new ResponseDeleted(
                 "DELETED",
@@ -70,6 +82,6 @@ public class CourseService {
     }
 
     public List<CourseResponse> findAll() {
-        return viewMapper.view(repository.findAll());
+        return viewMapper.view(courseRepository.findAll());
     }
 }

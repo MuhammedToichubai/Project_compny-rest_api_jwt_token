@@ -23,7 +23,7 @@ public class GroupApi {
 
     @PostMapping("/save")
     public GroupResponse save(@RequestBody GroupRequest request) {
-        return service.creat(request);
+        return service.save(request);
     }
 
     @PutMapping("/update/{id}")

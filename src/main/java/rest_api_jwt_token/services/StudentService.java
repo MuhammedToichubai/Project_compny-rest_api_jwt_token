@@ -4,9 +4,11 @@ import rest_api_jwt_token.dto.request.StudentRequest;
 import rest_api_jwt_token.dto.response.ResponseDeleted;
 import rest_api_jwt_token.dto.response.StudentResponse;
 import rest_api_jwt_token.exceptions.ThisNotFoundException;
+import rest_api_jwt_token.models.Group;
 import rest_api_jwt_token.models.Student;
 import rest_api_jwt_token.mapper.editMapper.StudentEditMapper;
 import rest_api_jwt_token.mapper.viewMapper.StudentViewMapper;
+import rest_api_jwt_token.repositories.GroupRepository;
 import rest_api_jwt_token.repositories.StudentRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,24 +20,34 @@ import java.util.List;
 @Service
 public class StudentService {
 
-    private final StudentRepository repository;
+    private final StudentRepository studentRepository;
     private final StudentEditMapper editMapper;
     private final StudentViewMapper viewMapper;
+    private final GroupRepository groupRepository;
 
-    public StudentService(StudentRepository repository, StudentEditMapper editMapper, StudentViewMapper viewMapper) {
-        this.repository = repository;
+    public StudentService(StudentRepository repository, StudentEditMapper editMapper, StudentViewMapper viewMapper, GroupRepository groupRepository) {
+        this.studentRepository = repository;
         this.editMapper = editMapper;
         this.viewMapper = viewMapper;
+        this.groupRepository = groupRepository;
     }
 
     public StudentResponse save(StudentRequest request) {
         Student student = editMapper.save(request);
-        repository.save(student);
+        student.setGroup(getGroupToStudent(request.getGroupId()));
+        studentRepository.save(student);
         return viewMapper.viewStudent(student);
     }
 
+    private Group getGroupToStudent(Long id){
+        return groupRepository.findById(id)
+                .orElseThrow( () -> new ThisNotFoundException(
+                        "Group whit id = " +id +" not found!"
+                ));
+    }
+
     private Student getStudentThroughId(Long id){
-        return repository.findById(id)
+        return studentRepository.findById(id)
                 .orElseThrow( () -> new ThisNotFoundException(
                         "Student whit id = " +id +" not found!"
                 ));
@@ -44,7 +56,7 @@ public class StudentService {
     public StudentResponse update(Long id, StudentRequest request) {
         Student student = getStudentThroughId(id);
         editMapper.update(student, request);
-        return viewMapper.viewStudent(repository.save(student));
+        return viewMapper.viewStudent(studentRepository.save(student));
     }
 
     public StudentResponse findById(Long id) {
@@ -54,13 +66,13 @@ public class StudentService {
 
     public ResponseDeleted delete(Long studentId) {
 
-        boolean exists = repository.existsById(studentId);
+        boolean exists = studentRepository.existsById(studentId);
         if (!exists) {
             throw new ThisNotFoundException(
                     "Student whit id = " + studentId + " not found!"
             );
         }
-        repository.deleteById(studentId);
+        studentRepository.deleteById(studentId);
 
         return new ResponseDeleted(
                 "DELETED",
@@ -69,6 +81,6 @@ public class StudentService {
 
     }
     public List<StudentResponse> findAll(){
-        return viewMapper.view(repository.findAll());
+        return viewMapper.view(studentRepository.findAll());
     }
 }

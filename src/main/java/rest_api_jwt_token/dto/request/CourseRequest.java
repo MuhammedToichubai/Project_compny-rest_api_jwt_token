@@ -2,7 +2,6 @@ package rest_api_jwt_token.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
-import rest_api_jwt_token.models.Company;
 
 /**
  * @author Muhammed Toichubai
@@ -13,5 +12,7 @@ public class CourseRequest {
 
     private String courseName;
     private String duration;
-    private String companyId;
+    private Long companyId;
+
+
 }

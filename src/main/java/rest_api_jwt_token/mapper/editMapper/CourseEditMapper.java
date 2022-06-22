@@ -1,12 +1,8 @@
 package rest_api_jwt_token.mapper.editMapper;
 
-import rest_api_jwt_token.dto.request.CourseRequest;
-import rest_api_jwt_token.exceptions.ThisNotFoundException;
-import rest_api_jwt_token.models.Company;
-import rest_api_jwt_token.models.Course;
 import org.springframework.stereotype.Component;
-import rest_api_jwt_token.repositories.CompanyRepository;
-import rest_api_jwt_token.services.CompanyService;
+import rest_api_jwt_token.dto.request.CourseRequest;
+import rest_api_jwt_token.models.Course;
 
 import java.time.LocalDateTime;
 
@@ -15,18 +11,6 @@ import java.time.LocalDateTime;
  */
 @Component
 public class CourseEditMapper {
-
-    private CompanyService companyService;
-    private CompanyRepository companyRepository;
-
-    private Company courseForTheCompany(Long id){
-        Course course = new Course();
-       return companyRepository.findById(id)
-                .orElseThrow( () -> new ThisNotFoundException(
-                        "Company whit id = " +id +" not found!"
-                ));
-    }
-
 
     public Course creat(CourseRequest courseRequest) {
         if (courseRequest == null) {

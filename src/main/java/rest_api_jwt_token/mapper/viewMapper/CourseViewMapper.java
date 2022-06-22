@@ -21,7 +21,7 @@ public class CourseViewMapper {
         courseResponse.setId(course.getId());
         courseResponse.setCourseName(course.getCourseName());
         courseResponse.setDuration(course.getDuration());
-       courseResponse.setLocalDateTime(course.getLocalDateTime());
+        courseResponse.setLocalDateTime(course.getLocalDateTime());
         courseResponse.setActive(course.isActive());
         return courseResponse;
     }

@@ -10,6 +10,8 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static javax.persistence.CascadeType.ALL;
+
 /**
  * @author Muhammed Toichubai
  */
@@ -38,8 +40,7 @@ public class Company {
     @Column(name = "company_country")
     private String localCountry;
 
-    @OneToMany(fetch = FetchType.EAGER,
-            cascade = {CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "company")
+    @OneToMany(mappedBy = "company", orphanRemoval = true,cascade = ALL)
     private List<Course> courses;
 
     @Column(name = "local_date_time")

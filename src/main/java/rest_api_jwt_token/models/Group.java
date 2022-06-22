@@ -1,19 +1,18 @@
 package rest_api_jwt_token.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static javax.persistence.CascadeType.*;
+import static javax.persistence.FetchType.EAGER;
 
 /**
  * @author Muhammed Toichubai
@@ -38,13 +37,10 @@ public class Group {
     private Long id;
 
     @Column(name = "group_name")
-    @NotEmpty
     private String groupName;
 
-    @NotEmpty
     private LocalDate start;
 
-    @NotEmpty
     private LocalDate finish;
 
     @Column(name = "local_date_time")
@@ -54,18 +50,10 @@ public class Group {
     @Column(name = "is_active")
     private boolean isActive;
 
-
-    @ManyToMany(cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
-    @JsonIgnore
+    @ManyToMany(cascade = {MERGE, PERSIST})
     private List<Course> courses;
 
-    @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
-    @Fetch(value = FetchMode.SUBSELECT)
+    @OneToMany(cascade = ALL, mappedBy = "group")
     private List<Student> students;
-
-    @ManyToOne
-    @JsonIgnore
-    private Company company;
-
 
 }

@@ -11,6 +11,8 @@ import rest_api_jwt_token.models.enums.StudyFormat;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static javax.persistence.CascadeType.*;
+
 /**
  * @author Muhammed Toichubai
  */
@@ -49,8 +51,7 @@ public class Student {
     @Column(name = "is_active")
     private boolean isActive;
 
-    @ManyToOne()
-    @JsonIgnore
+    @ManyToOne(cascade = {MERGE,DETACH,REFRESH})
     private Group group;
 
 }
