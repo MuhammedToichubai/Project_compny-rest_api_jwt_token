@@ -22,4 +22,5 @@ public class CompanyResponse {
     private List<Course> courses;
     private LocalDateTime localDateTime;
     private boolean isActive;
+
 }

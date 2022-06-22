@@ -35,7 +35,7 @@ public class TeacherService {
 
     public TeacherResponse save(TeacherRequest request) {
         Teacher teacher = editMapper.save(request);
-        teacher.setCourse(getCourseToTeacher(request.getCourseId()));
+       teacher.setCourse(getCourseToTeacher(request.getCourseId()));
         teacherRepository.save(teacher);
         return viewMapper.viewTeacher(teacher);
     }

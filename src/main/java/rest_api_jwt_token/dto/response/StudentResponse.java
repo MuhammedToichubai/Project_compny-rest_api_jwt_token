@@ -18,6 +18,7 @@ public class StudentResponse {
     private String surname;
     private String email;
     private StudyFormat studyFormat;
+    private String groupName;
     private LocalDateTime localDateTime;
     private boolean isActive;
 

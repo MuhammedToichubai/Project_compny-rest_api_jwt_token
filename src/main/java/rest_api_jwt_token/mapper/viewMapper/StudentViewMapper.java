@@ -23,6 +23,7 @@ public class StudentViewMapper {
         response.setSurname(student.getSurname());
         response.setEmail(student.getEmail());
         response.setStudyFormat(student.getStudyFormat());
+        response.setGroupName(student.getGroup().getGroupName());
         response.setLocalDateTime(student.getLocalDateTime());
         response.setActive(student.isActive());
         return response;

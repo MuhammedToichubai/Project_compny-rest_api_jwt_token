@@ -15,6 +15,7 @@ public class TeacherResponse {
     private Long id;
     private String name;
     private String surname;
+    private String courseName;
     private LocalDateTime localDateTime;
     private boolean isActive;
 }

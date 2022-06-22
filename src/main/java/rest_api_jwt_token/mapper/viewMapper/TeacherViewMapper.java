@@ -22,6 +22,7 @@ public class TeacherViewMapper {
         response.setId(teacher.getId());
         response.setName(teacher.getName());
         response.setSurname(teacher.getSurname());
+        response.setCourseName(teacher.getCourse().getCourseName());
         response.setLocalDateTime(teacher.getLocalDateTime());
         response.setActive(teacher.isActive());
         return response;

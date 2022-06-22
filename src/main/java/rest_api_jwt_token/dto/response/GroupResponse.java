@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author Muhammed Toichubai
@@ -16,6 +17,7 @@ public class GroupResponse {
     private String groupName;
     private String start;
     private String finish;
+    private List<String> coursesName;
     private LocalDateTime localDateTime;
     private boolean isActive;
 

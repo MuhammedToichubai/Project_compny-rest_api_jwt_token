@@ -9,13 +9,13 @@ import java.time.LocalDateTime;
 /**
  * @author Muhammed Toichubai
  */
-@Getter
-@Setter
+@Getter @Setter
 public class CourseResponse {
 
     private Long id;
     private String courseName;
     private String duration;
+    private String companyName;
     private LocalDateTime localDateTime;
     private boolean isActive;
 }

@@ -12,6 +12,7 @@ import java.util.List;
  */
 @Component
 public class CompanyViewMapper {
+
     public CompanyResponse viewCompany(Company company) {
         if (company == null) {
             return null;

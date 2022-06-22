@@ -1,6 +1,7 @@
 package rest_api_jwt_token.mapper.viewMapper;
 
 import rest_api_jwt_token.dto.response.GroupResponse;
+import rest_api_jwt_token.models.Course;
 import rest_api_jwt_token.models.Group;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +26,13 @@ public class GroupViewMapper {
         response.setGroupName(group.getGroupName());
         response.setStart(group.getStart().format( DateTimeFormatter.ISO_LOCAL_DATE ));
         response.setFinish(group.getFinish().format( DateTimeFormatter.ISO_LOCAL_DATE));
+
+        List<String> courseName = new ArrayList<>();
+        for (Course course: group.getCourses()) {
+            courseName.add(course.getCourseName());
+            response.setCoursesName(courseName);
+        }
+
         response.setLocalDateTime(group.getLocalDateTime());
         response.setActive(group.isActive());
         return response;
