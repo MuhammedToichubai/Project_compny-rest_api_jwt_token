@@ -1,8 +1,11 @@
 package rest_api_jwt_token.services;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import rest_api_jwt_token.dto.request.StudentRequest;
 import rest_api_jwt_token.dto.response.ResponseDeleted;
 import rest_api_jwt_token.dto.response.StudentResponse;
+import rest_api_jwt_token.exceptions.BadRequest;
 import rest_api_jwt_token.exceptions.ThisNotFoundException;
 import rest_api_jwt_token.models.Group;
 import rest_api_jwt_token.models.Student;
@@ -12,7 +15,10 @@ import rest_api_jwt_token.repositories.GroupRepository;
 import rest_api_jwt_token.repositories.StudentRepository;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Muhammed Toichubai
@@ -34,8 +40,9 @@ public class StudentService {
 
     public StudentResponse save(StudentRequest request) {
         Student student = editMapper.save(request);
-        student.setGroup(getGroupToStudent(request.getGroupId()));
-        studentRepository.save(student);
+        Student verifiedStudent = checkName(student);
+        verifiedStudent.setGroup(getGroupToStudent(request.getGroupId()));
+        studentRepository.save(verifiedStudent);
         return viewMapper.viewStudent(student);
     }
 
@@ -53,6 +60,7 @@ public class StudentService {
                 ));
     }
 
+    @Transactional
     public StudentResponse update(Long id, StudentRequest request) {
         Student student = getStudentThroughId(id);
         editMapper.update(student, request);
@@ -82,5 +90,17 @@ public class StudentService {
     }
     public List<StudentResponse> findAll(){
         return viewMapper.view(studentRepository.findAll());
+    }
+
+    public Student checkName(Student student){
+        List<Student> students = studentRepository.findAll();
+        for (Student st : students) {
+            if (Objects.equals(st.getEmail(), student.getEmail())){
+                throw new BadRequest(
+                        "Email must be unique !"
+                );
+            }
+        }
+        return student;
     }
 }

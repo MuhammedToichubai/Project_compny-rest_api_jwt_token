@@ -3,6 +3,7 @@ package rest_api_jwt_token.services;
 import rest_api_jwt_token.dto.request.CourseRequest;
 import rest_api_jwt_token.dto.response.CourseResponse;
 import rest_api_jwt_token.dto.response.ResponseDeleted;
+import rest_api_jwt_token.exceptions.BadRequest;
 import rest_api_jwt_token.exceptions.ThisNotFoundException;
 import rest_api_jwt_token.models.Company;
 import rest_api_jwt_token.models.Course;
@@ -12,7 +13,9 @@ import rest_api_jwt_token.repositories.CompanyRepository;
 import rest_api_jwt_token.repositories.CourseRepository;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Muhammed Toichubai
@@ -34,8 +37,9 @@ public class CourseService {
 
     public CourseResponse save(CourseRequest request) {
         Course course = editMapper.creat(request);
-        course.setCompany(getCompanyToCourse(request.getCompanyId()));
-        courseRepository.save(course);
+        Course verifiedCourse = checkName(course);
+        verifiedCourse.setCompany(getCompanyToCourse(request.getCompanyId()));
+        courseRepository.save(verifiedCourse);
         return viewMapper.viewCourse(course);
     }
 
@@ -53,6 +57,7 @@ public class CourseService {
                 ));
     }
 
+    @Transactional
     public CourseResponse update(Long id, CourseRequest request) {
         Course course = getCourseThroughId(id);
         editMapper.update(course, request);
@@ -83,5 +88,18 @@ public class CourseService {
 
     public List<CourseResponse> findAll() {
         return viewMapper.view(courseRepository.findAll());
+    }
+
+    public Course checkName(Course course){
+        List<Course> courses = courseRepository.findAll();
+        for (Course cor : courses) {
+            if (Objects.equals(cor.getCourseName(), course.getCourseName())){
+                throw new BadRequest(
+                        "There is a course with that name : "+course.getCourseName()
+                                +"! Need to create with different names."
+                );
+            }
+        }
+        return course;
     }
 }

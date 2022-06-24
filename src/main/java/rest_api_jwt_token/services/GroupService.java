@@ -3,6 +3,7 @@ package rest_api_jwt_token.services;
 import rest_api_jwt_token.dto.request.GroupRequest;
 import rest_api_jwt_token.dto.response.GroupResponse;
 import rest_api_jwt_token.dto.response.ResponseDeleted;
+import rest_api_jwt_token.exceptions.BadRequest;
 import rest_api_jwt_token.exceptions.ThisNotFoundException;
 import rest_api_jwt_token.models.Course;
 import rest_api_jwt_token.models.Group;
@@ -13,8 +14,10 @@ import rest_api_jwt_token.repositories.GroupRepository;
 import org.springframework.stereotype.Service;
 import rest_api_jwt_token.repositories.StudentRepository;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Muhammed Toichubai
@@ -36,8 +39,9 @@ public class GroupService {
 
     public GroupResponse save(GroupRequest request) {
         Group group = editMapper.save(request);
-        group.setCourses(getCoursesToGroup(request.getCourse()));
-        groupRepository.save(group);
+        Group verifiedGroup = checkName(group);
+        verifiedGroup.setCourses(getCoursesToGroup(request.getCourse()));
+        groupRepository.save(verifiedGroup);
         return viewMapper.viewGroup(group);
     }
 
@@ -60,6 +64,7 @@ public class GroupService {
                 ));
     }
 
+    @Transactional
     public GroupResponse update(Long id, GroupRequest request) {
         Group group = getGroupThroughId(id);
         editMapper.update(group, request);
@@ -90,5 +95,18 @@ public class GroupService {
 
     public List<GroupResponse> findAll() {
         return viewMapper.view(groupRepository.findAll());
+    }
+
+    public Group checkName(Group group){
+        List<Group> groups = groupRepository.findAll();
+        for (Group gr : groups) {
+            if (Objects.equals(gr.getGroupName(), group.getGroupName())){
+                throw new BadRequest(
+                        "There is a group with that name : "+group.getGroupName()
+                                +"! Need to create with different names."
+                );
+            }
+        }
+        return group;
     }
 }

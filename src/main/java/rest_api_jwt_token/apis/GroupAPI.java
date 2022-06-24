@@ -1,5 +1,6 @@
 package rest_api_jwt_token.apis;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import rest_api_jwt_token.dto.request.GroupRequest;
 import rest_api_jwt_token.dto.response.GroupResponse;
 import rest_api_jwt_token.dto.response.ResponseDeleted;
@@ -13,11 +14,12 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/group")
-public class GroupApi {
+@PreAuthorize("hasAnyAuthority('ADMIN','TEACHER')")
+public class GroupAPI {
 
     public final GroupService service;
 
-    public GroupApi(GroupService service) {
+    public GroupAPI(GroupService service) {
         this.service = service;
     }
 
@@ -41,6 +43,7 @@ public class GroupApi {
         return service.delete(id);
     }
 
+    @PreAuthorize(value = "hasAuthority('STUDENT')")
     @GetMapping("/findAll")
     public List<GroupResponse> findAll() {
         return service.findAll();

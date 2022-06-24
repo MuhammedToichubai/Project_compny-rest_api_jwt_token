@@ -1,5 +1,6 @@
 package rest_api_jwt_token.apis;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import rest_api_jwt_token.dto.request.CompanyRequest;
 import rest_api_jwt_token.dto.response.CompanyResponse;
@@ -13,14 +14,14 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/companies")
-public class CompanyApi {
+@PreAuthorize("hasAuthority('ADMIN')")
+public class CompanyAPI {
 
     private final CompanyService companyService;
 
-    public CompanyApi(CompanyService service) {
+    public CompanyAPI(CompanyService service) {
         this.companyService = service;
     }
-
 
     @PostMapping("/save")
     public CompanyResponse save(@RequestBody CompanyRequest request) {
@@ -39,10 +40,10 @@ public class CompanyApi {
 
     @DeleteMapping("/delete/{id}")
     public ResponseDeleted deleteCompanyById(@PathVariable Long id) {
-
         return companyService.deleteBy(id);
     }
 
+    @PreAuthorize("hasAnyAuthority('TEACHER','STUDENT')")
     @GetMapping("/findAll")
     public List<CompanyResponse> findAll() {
         return companyService.findAll();

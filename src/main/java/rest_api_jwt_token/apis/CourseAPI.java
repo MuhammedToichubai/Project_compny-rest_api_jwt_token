@@ -1,5 +1,6 @@
 package rest_api_jwt_token.apis;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import rest_api_jwt_token.dto.request.CourseRequest;
 import rest_api_jwt_token.dto.response.CourseResponse;
 import rest_api_jwt_token.dto.response.ResponseDeleted;
@@ -13,11 +14,12 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/course")
-public class CourseApi {
+@PreAuthorize("hasAnyAuthority('ADMIN','TEACHER')")
+public class CourseAPI {
 
     private final CourseService courseService;
 
-    public CourseApi(CourseService courseService) {
+    public CourseAPI(CourseService courseService) {
         this.courseService = courseService;
     }
 
@@ -42,6 +44,7 @@ public class CourseApi {
         return courseService.delete(id);
     }
 
+    @PreAuthorize(value = "hasAuthority('STUDNET')")
     @GetMapping("/findAll")
     public List<CourseResponse> findAll() {
         return courseService.findAll();
