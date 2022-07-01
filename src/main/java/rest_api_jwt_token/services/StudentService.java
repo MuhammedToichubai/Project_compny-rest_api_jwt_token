@@ -40,7 +40,7 @@ public class StudentService {
 
     public StudentResponse save(StudentRequest request) {
         Student student = editMapper.save(request);
-        Student verifiedStudent = checkName(student);
+        Student verifiedStudent = checkEmail(student);
         verifiedStudent.setGroup(getGroupToStudent(request.getGroupId()));
         studentRepository.save(verifiedStudent);
         return viewMapper.viewStudent(student);
@@ -92,7 +92,7 @@ public class StudentService {
         return viewMapper.view(studentRepository.findAll());
     }
 
-    public Student checkName(Student student){
+    public Student checkEmail(Student student){
         List<Student> students = studentRepository.findAll();
         for (Student st : students) {
             if (Objects.equals(st.getEmail(), student.getEmail())){

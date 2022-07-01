@@ -35,6 +35,7 @@ public class AuthAPI {
     @PostMapping("login")
     public ResponseEntity<LoginResponse> getLogin(@RequestBody RegisterRequest request) {
         try {
+            
             UsernamePasswordAuthenticationToken token =
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
             User user = repository.findByEmail(token.getName()).get();

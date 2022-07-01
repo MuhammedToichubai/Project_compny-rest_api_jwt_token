@@ -8,8 +8,6 @@ import rest_api_jwt_token.exceptions.ThisNotFoundException;
 import rest_api_jwt_token.models.Company;
 import rest_api_jwt_token.mapper.editMapper.CompanyEditMapper;
 import rest_api_jwt_token.mapper.viewMapper.CompanyViewMapper;
-import rest_api_jwt_token.models.Course;
-import rest_api_jwt_token.models.Teacher;
 import rest_api_jwt_token.repositories.CompanyRepository;
 import org.springframework.stereotype.Service;
 
